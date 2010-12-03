@@ -1,21 +1,28 @@
 {{
-**      GE Color Effects Control Object
-**      Version 0.2, 2010-12-02
-**      by Robert Quattlebaum <darco@deepdarc.com>
-**      
-**      This object is public domain. You may use it as you see fit.
+**  GE Color Effects Control Object
+**  Version 0.2, 2010-12-02
+**  by Robert Quattlebaum <darco@deepdarc.com>
+**
+**  http://www.deepdarc.com/2010/11/27/hacking-christmas-lights/
+**  
+**  This object file is public domain. You may use it as you see fit.
 }}
-CON
+CON { General constants }
     CMD_LEN             = 26
     MAX_COLOR_VALUE     = $F
     MAX_HUE             = (MAX_COLOR_VALUE+1)*6-1
 
-    DEFAULT_INTENSITY   = $CC
+    DEFAULT_INTENSITY   = $CC   ' Default controler never uses larger than this.
     MAX_INTENSITY       = $FF
     
+    MAX_BULB            = $3E   ' Theoretical last possible bulb address. Note
+                                ' that normally there are only 50 bulbs on a string.
+    BROADCAST_BULB      = $3F   ' Intensity set on this bulb affects all bulbs.
+    
+CON { Color convenience constants }
     COLOR_MASK          = $FFF
     COLOR_BLACK         = $000
-    COLOR_WHITE         = $DDD  ' Default controler uses this value for white
+    COLOR_WHITE         = $DDD  ' Default controler uses this value for white.
     COLOR_BLUE          = $F00
     COLOR_GREEN         = $0F0
     COLOR_RED           = $00F
@@ -33,12 +40,17 @@ VAR
 
 PUB stand_alone_test | i,j
 {{ Stand alone test. Used only when you run this object directly. }}
+    ' Start up our cog.
     start(12)
+
+    ' Give the attached string the default bulb enumeration.
     set_standard_enum
+
+    ' This code makes an animated rainbow.
     repeat
         i++
-        repeat j from 0 to 49
-            set_bulb(j,DEFAULT_INTENSITY,i+j)
+        repeat j from 0 to MAX_BULB
+            set_bulb(j,DEFAULT_INTENSITY,make_color_hue((i+j)//constant(MAX_HUE+1)))
 
 PUB start(pin)
 {{ Starts the cog for the object using the given pin index for output. }}
@@ -46,7 +58,7 @@ PUB start(pin)
     stop
     
     ' Set up pin
-    gecepin := |< pin
+    output_pin_mask := |< pin
     
     ' Set the timing information
     period_10_us := (clkfreq/1_000_000) * 10
@@ -68,7 +80,7 @@ PUB stop
 
 PUB set_standard_enum | i
 {{ Performs the standard bulb enumeration for individual bulb control. }} 
-    repeat i from 0 to 62
+    repeat i from 0 to MAX_BULB
         set_bulb(i,DEFAULT_INTENSITY,COLOR_BLACK)
 
 PUB flush
@@ -121,14 +133,21 @@ PUB set_bulb(bulb,intensity,color) | x
 DAT { Cog Implementation }
             org
 
-cog_init    or      dira, gecepin   ' Initialize output pin direction
+cog_init    or      dira, output_pin_mask   ' Initialize output pin direction
 
-loop        wrlong  zero,par        ' Clear out the command
+loop        wrlong  zero,par                ' Clear out the previous command
 
-:waitforcmd rdlong  current_command,par wz  ' Wait for command
+:waitforcmd rdlong  current_command,par wz  ' Wait for next command
     if_z    jmp     #:waitforcmd
 
-            ' Load number of data bits
+            ' Send the received command
+            call    #send_cmd
+
+            ' Jump back to the start and wait for next command
+            jmp     #loop
+
+DAT { Send Command Subroutine }
+send_cmd    ' Load number of data bits
             mov     current_bit, #CMD_LEN
 
             ' Rotate the bits so that the next bit is at bit zero.
@@ -139,34 +158,33 @@ loop        wrlong  zero,par        ' Clear out the command
             add     next_cnt, cnt
 
             ' Send start pulse
-            or      outa, gecepin           ' Output high
+            or      outa, output_pin_mask   ' Output high
             waitcnt next_cnt, period_10_us  ' Wait 10 uSeconds
-            andn    outa, gecepin           ' Output low
+            andn    outa, output_pin_mask   ' Output low
 
 :output_loop
             rol     current_command, #1 wc
 
-    if_c    waitcnt next_cnt, period_10_us  ' Wait 10 uSeconds
+    if_c    waitcnt next_cnt, period_10_us  ' Wait extra 10 uSeconds if one bit
             waitcnt next_cnt, period_10_us  ' Wait 10 uSeconds
-            or      outa, gecepin           ' Output high
-    if_nc   waitcnt next_cnt, period_10_us  ' Wait 10 uSeconds
+            or      outa, output_pin_mask   ' Output high
+    if_nc   waitcnt next_cnt, period_10_us  ' Wait extra 10 uSeconds if zero bit
             waitcnt next_cnt, period_10_us  ' Wait 10 uSeconds
-            andn    outa, gecepin           ' Output low
+            andn    outa, output_pin_mask   ' Output low
         
             ' Decrement current_bit ; jump if not Zero
             djnz    current_bit,    #:output_loop
 
-            ' Finish up the frame
+            ' Finish up the frame with 30 uSecond quiet period.
             waitcnt     next_cnt, period_10_us  ' Wait 10 uSeconds
             waitcnt     next_cnt, period_10_us  ' Wait 10 uSeconds
             waitcnt     next_cnt, period_10_us  ' Wait 10 uSeconds
 
-            ' Jump back to the start and wait for next command
-            jmp     #loop
+send_cmd_ret ret
 
 DAT { Constants }
 period_10_us    long    0       ' Set at init time
-gecepin         long    0       ' Set at init time
+output_pin_mask long    0       ' Set at init time
 zero            long    0
 
 DAT { Variables }
