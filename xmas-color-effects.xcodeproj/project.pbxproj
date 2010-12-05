@@ -1,0 +1,122 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		A616F1F412A5AAE40004B4B7 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		A616F1F512A5AAE40004B4B7 /* xmas.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xmas.c; sourceTree = "<group>"; };
+		A616F1F612A5AAE40004B4B7 /* xmas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xmas.h; sourceTree = "<group>"; };
+		A616F1F712A5B0D00004B4B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		A68043A712A87C8E0035D6DE /* main.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.spin; sourceTree = "<group>"; usesTabs = 0; };
+		A68043A912A87C8E0035D6DE /* auth_digest.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = auth_digest.spin; sourceTree = "<group>"; };
+		A68043AA12A87C8E0035D6DE /* driver_enc28j60.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = driver_enc28j60.spin; sourceTree = "<group>"; };
+		A68043AB12A87C8E0035D6DE /* driver_socket.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = driver_socket.spin; sourceTree = "<group>"; };
+		A68043AC12A87C8E0035D6DE /* Fast_I2C_Driver.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Fast_I2C_Driver.spin; sourceTree = "<group>"; };
+		A68043AD12A87C8E0035D6DE /* pause.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pause.spin; sourceTree = "<group>"; };
+		A68043AE12A87C8E0035D6DE /* settings.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = settings.spin; sourceTree = "<group>"; };
+		A68043AF12A87C8E0035D6DE /* subsys.spin */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subsys.spin; sourceTree = "<group>"; };
+		A6FBDC9612A81B8C00CD8B0A /* xmas.spin */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = text; lineEnding = 0; path = xmas.spin; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		A616F1E212A5AAAA0004B4B7 = {
+			isa = PBXGroup;
+			children = (
+				A616F1F712A5B0D00004B4B7 /* Makefile */,
+				A616F1F312A5AAC10004B4B7 /* Sources */,
+			);
+			sourceTree = "<group>";
+		};
+		A616F1F312A5AAC10004B4B7 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A6FBDC9412A81B8C00CD8B0A /* prop */,
+				A616F1F412A5AAE40004B4B7 /* main.c */,
+				A616F1F512A5AAE40004B4B7 /* xmas.c */,
+				A616F1F612A5AAE40004B4B7 /* xmas.h */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		A68043A812A87C8E0035D6DE /* ybox2 */ = {
+			isa = PBXGroup;
+			children = (
+				A68043A912A87C8E0035D6DE /* auth_digest.spin */,
+				A68043AA12A87C8E0035D6DE /* driver_enc28j60.spin */,
+				A68043AB12A87C8E0035D6DE /* driver_socket.spin */,
+				A68043AC12A87C8E0035D6DE /* Fast_I2C_Driver.spin */,
+				A68043AD12A87C8E0035D6DE /* pause.spin */,
+				A68043AE12A87C8E0035D6DE /* settings.spin */,
+				A68043AF12A87C8E0035D6DE /* subsys.spin */,
+			);
+			path = ybox2;
+			sourceTree = "<group>";
+		};
+		A6FBDC9412A81B8C00CD8B0A /* prop */ = {
+			isa = PBXGroup;
+			children = (
+				A68043A812A87C8E0035D6DE /* ybox2 */,
+				A68043A712A87C8E0035D6DE /* main.spin */,
+				A6FBDC9612A81B8C00CD8B0A /* xmas.spin */,
+			);
+			path = prop;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		A616F1E412A5AAAA0004B4B7 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = A616F1E712A5AAAA0004B4B7 /* Build configuration list for PBXProject "xmas-color-effects" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = A616F1E212A5AAAA0004B4B7;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A616F1E512A5AAAA0004B4B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		A616F1E612A5AAAA0004B4B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A616F1E712A5AAAA0004B4B7 /* Build configuration list for PBXProject "xmas-color-effects" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A616F1E512A5AAAA0004B4B7 /* Debug */,
+				A616F1E612A5AAAA0004B4B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A616F1E412A5AAAA0004B4B7 /* Project object */;
+}
