@@ -38,7 +38,7 @@ VAR
     byte cog
     long command
 
-PUB stand_alone_test | i,j
+PUB stand_alone_test | i,j,b
 {{ Stand alone test. Used only when you run this object directly. }}
     ' Start up our cog.
     start(12)
@@ -48,9 +48,22 @@ PUB stand_alone_test | i,j
 
     ' This code makes an animated rainbow.
     repeat
-        i++
-        repeat j from 0 to MAX_BULB
-            set_bulb(j,DEFAULT_INTENSITY,make_color_hue((i+j)//constant(MAX_HUE+1)))
+        repeat until ina[16]
+            i++
+            repeat j from 0 to MAX_BULB
+                set_bulb(j,b,make_color_hue((i+j)//constant(MAX_HUE+1)))
+            repeat 4
+                if b<DEFAULT_INTENSITY
+                    b++
+                    set_bulb(BROADCAST_BULB,b,0)        
+        repeat while b
+            i++
+            b--
+            set_bulb(BROADCAST_BULB,b,0)        
+            repeat 100
+        repeat while ina[16]
+        repeat until ina[16]
+        repeat while ina[16]
 
 PUB start(pin)
 {{ Starts the cog for the object using the given pin index for output. }}
