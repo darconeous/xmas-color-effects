@@ -19,12 +19,13 @@ OBJ
 
   numbers       : "numbers"
 
-  xmas          : "xmas"
+  xmas_ctrl     : "xmas_ctrl"
   
 VAR
   long xmas_stack[40] 
   long hits
   byte xmas_mode_cog
+
   
 DAT
 productName   BYTE      "ybox2 + GE Color Effects",0      
@@ -58,7 +59,7 @@ PUB init | i
 
   subsys.StatusLoading
 
-  start_xmas
+  xmas_ctrl.start
 
   dira[subsys#SPKRPin]:=!settings.findKey(settings#MISC_SOUND_DISABLE)
   
@@ -95,155 +96,6 @@ PUB init | i
 PRI delay_ms(Duration)
     waitcnt(((clkfreq / 1_000 * Duration - 3932)) + cnt)
 
-PRI start_xmas
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop, @xmas_stack) + 1
-
-PRI xmas_loop | i,j
-    ' This code makes an animated rainbow.
-    repeat
-        i++
-        repeat j from 0 to xmas#MAX_BULB
-            xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_hue((i+j)//constant(xmas#MAX_HUE+1)))
-
-PRI start_xmas2
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop2, @xmas_stack) + 1
-
-PRI xmas_loop2 | i,j
-    repeat
-        i++
-        repeat j from 0 to xmas#MAX_BULB
-            xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_hue((i)//constant(xmas#MAX_HUE+1)))
-
-PRI start_xmas3
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop3, @xmas_stack) + 1
-
-PRI xmas_loop3 | i,i2,j,j2,count,intensity
-    ' Twinkle
-    count:=14
-    repeat
-        i *= 37
-        i += 13
-        i //= 64
-        repeat j from xmas#MAX_INTENSITY/count to 0
-            'delay_ms(1)
-            i2 := i
-            repeat j2 from 0 to count-1
-                i2 *= 37
-                i2 += 13
-                i2 //= 64
-                if i2 <> xmas#BROADCAST_BULB
-                    intensity := j+(xmas#MAX_INTENSITY/count)*j2
-                    'xmas.set_bulb(i2,intensity*intensity/255,$7BF)
-                    xmas.set_bulb(i2,intensity*intensity/255,$FFF)
-
-PRI start_xmas4
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop4, @xmas_stack) + 1
-
-PRI xmas_loop4 | i,j
-    ' red/green stripes
-    repeat
-        delay_ms(10)
-        i++
-        repeat j from 0 to xmas#MAX_BULB
-            if ((j+i)/5)&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas#COLOR_RED)
-            else
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas#COLOR_GREEN)
-
-PRI start_xmas5
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop5, @xmas_stack) + 1
-
-PRI xmas_loop5 | i,i2,j,j2,count,intensity
-    ' Trail
-    count:=6
-    repeat
-        i ++
-        i //= 50
-        repeat j from xmas#MAX_INTENSITY/count to 0
-            'delay_ms(1)
-            i2 := i
-            repeat j2 from 0 to count-1
-                i2 ++
-                i2 //= 50
-                if i2 <> xmas#BROADCAST_BULB
-                    intensity := j+(xmas#MAX_INTENSITY/count)*j2
-                    xmas.set_bulb(i2,intensity*intensity/255,xmas#COLOR_WHITE)
-
-{
-    ' other stripes
-    msec := clkfreq/5
-    repeat
-        repeat j from 0 to xmas#MAX_BULB
-            if ((cnt+msec*(j*j/xmas#MAX_BULB))/clkfreq)&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas#COLOR_RED)
-            else
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas#COLOR_GREEN)
-}
-
-PRI start_xmas6
-    stop_xmas
-    xmas.start(12)
-    xmas.set_standard_enum
-    xmas_mode_cog := cognew(xmas_loop6, @xmas_stack) + 1
-
-PRI xmas_loop6 | i,j,fading_intensity
-    ' simple chaser
-    repeat
-        repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
-            fading_intensity := xmas#DEFAULT_INTENSITY-i
-            fading_intensity *= fading_intensity
-            fading_intensity /= xmas#DEFAULT_INTENSITY
-            repeat j from 0 to 49
-                if j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,$27F)
-                else
-                    xmas.set_bulb(j,fading_intensity,$27F)
-        repeat j from 0 to 49
-            if j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,$27F)
-            else
-                xmas.set_bulb(j,0,$27F)
-        delay_ms(250)
-        repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
-            fading_intensity := xmas#DEFAULT_INTENSITY-i
-            fading_intensity *= fading_intensity
-            fading_intensity /= xmas#DEFAULT_INTENSITY
-            repeat j from 0 to 49
-                ifnot j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,$27F)
-                else
-                    xmas.set_bulb(j,fading_intensity,$27F)
-        repeat j from 0 to 49
-            ifnot j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,$27F)
-            else
-                xmas.set_bulb(j,0,$27F)
-        delay_ms(250)
-
-
-
-
-
-PRI stop_xmas
-    if xmas_mode_cog
-        cogstop(xmas_mode_cog~ - 1)
-        xmas.set_standard_enum  
-
 PUB atoi(inptr):retVal | i,char
   retVal~
   
@@ -260,7 +112,7 @@ PUB atoi(inptr):retVal | i,char
            
 VAR
   byte httpMethod[8]
-  byte httpPath[64]
+  byte httpPath[128]
   byte httpQuery[64]
   byte httpHeader[32]
   byte buffer[128]
@@ -351,6 +203,51 @@ pub httpServer | char, i, contentLength,authorized,queryPtr, tmp1, tmp2, tmp3
         socket.close
         delay_ms(1000)
         reboot
+      elseif strcomp(@httpPath,string("/config"))
+        if authorized<>auth#STAT_AUTH
+          httpUnauthorized(authorized)
+          socket.close
+          next
+
+        if contentLength
+          i:=0
+          repeat while contentLength AND i<127
+            httpPath[i++]:=socket.rxtime(1000)
+            contentLength--
+          httpPath[i]~
+          queryPtr:=@httpPath
+         
+        if http.getFieldFromQuery(queryPtr,string("AH"),@buffer,127)
+          settings.setByte(xmas_ctrl#ON_ALARM_HOUR, atoi(@buffer))  
+
+        if http.getFieldFromQuery(queryPtr,string("AM"),@buffer,127)
+          settings.setByte(xmas_ctrl#ON_ALARM_MIN, atoi(@buffer))  
+
+        if http.getFieldFromQuery(queryPtr,string("aH"),@buffer,127)
+          settings.setByte(xmas_ctrl#OFF_ALARM_HOUR, atoi(@buffer))  
+
+        if http.getFieldFromQuery(queryPtr,string("aM"),@buffer,127)
+          settings.setByte(xmas_ctrl#OFF_ALARM_MIN, atoi(@buffer))  
+
+        if http.getFieldFromQuery(queryPtr,string("CH"),@buffer,127)
+            tmp1 := atoi(@buffer)
+            tmp2 := xmas_ctrl.get_current_minute
+            if http.getFieldFromQuery(queryPtr,string("CM"),@buffer,127)
+                tmp2 := atoi(@buffer)
+            xmas_ctrl.set_time_of_day(tmp1,tmp2,xmas_ctrl.get_current_second)
+            
+        xmas_ctrl.refresh_alarm_settings
+         
+        settings.removeKey($1010)
+        settings.removeKey(settings#MISC_STAGE2)
+        settings.commit
+        
+        socket.str(@HTTP_303)
+        socket.str(string("Location: /",13,10))
+        socket.str(@HTTP_CONNECTION_CLOSE)
+        socket.str(@CR_LF)
+        socket.str(string("OK",13,10))
+
       elseif strcomp(@httpPath,string("/xmas"))
         if authorized<>auth#STAT_AUTH
           httpUnauthorized(authorized)
@@ -361,14 +258,11 @@ pub httpServer | char, i, contentLength,authorized,queryPtr, tmp1, tmp2, tmp3
         socket.str(@HTTP_CONNECTION_CLOSE)
         socket.str(@CR_LF)
         i:=numbers.FromStr(queryPtr,numbers#HEX)
-        case i
-            1: start_xmas
-            2: start_xmas2
-            3: start_xmas3
-            4: start_xmas4
-            5: start_xmas5
-            6: start_xmas6
-            0: stop_xmas
+        if i==0
+            xmas_ctrl.set_active(FALSE)
+        else
+            xmas_ctrl.set_program(i)
+            xmas_ctrl.set_active(TRUE)
         socket.str(string(" OK",13,10))
       else           
         socket.str(@HTTP_404)
@@ -394,7 +288,9 @@ pri httpOutputLink(url,class,content)
   socket.str(content)
   socket.str(string("</a>"))
 
-pri indexPage | i
+
+
+pri indexPage | i,j
 
   socket.str(string("<html><head><meta name='viewport' content='width=320' /><title>ybox2</title>"))
   socket.str(string("<link rel='stylesheet' href='http://www.deepdarc.com/ybox2.css' />"))
@@ -409,11 +305,11 @@ pri indexPage | i
       socket.hex(byte[@httpMethod][i],2)
     socket.str(string("</tt></div>"))
   socket.str(string("<div><tt>Uptime: "))
-  socket.dec(subsys.RTC/3600)
+  socket.dec(subsys.uptime/3600)
   socket.tx("h")
-  socket.dec(subsys.RTC/60//60)
+  socket.dec(subsys.uptime/60//60)
   socket.tx("m")
-  socket.dec(subsys.RTC//60)
+  socket.dec(subsys.uptime//60)
   socket.tx("s")
   socket.str(string("</tt></div>"))
   socket.str(string("<div><tt>Hits: "))
@@ -422,6 +318,7 @@ pri indexPage | i
    
   socket.str(string("<h2>Actions</h2>"))
   socket.str(string("<h3>Christmas Lights</h3>"))
+
   socket.str(string("<p>"))
   httpOutputLink(string("/xmas?1"),string("green button"),string("Rainbow"))
   socket.str(string("</p><p>"))
@@ -439,6 +336,78 @@ pri indexPage | i
     
   socket.str(string("</p>"))
 
+  socket.str(string("<h2>Settings</h2>"))
+  socket.str(string("<form action='/config' method='GET'>"))
+        socket.str(string("Current time: <br> <select name='CH' size='1'>"))
+        j :=  xmas_ctrl.get_current_hour
+        repeat i from 0 to 23
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> : <select name='CM' size='1'>"))
+        j :=  xmas_ctrl.get_current_minute  
+        repeat i from 0 to 59
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> <br>"))
+
+
+        socket.str(string("On alarm time: <br> <select name='AH' size='1'>"))
+        j :=  settings.getByte(xmas_ctrl#ON_ALARM_HOUR)
+        repeat i from 0 to 23
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> : <select name='AM' size='1'>"))
+        j :=  settings.getByte(xmas_ctrl#ON_ALARM_MIN)  
+        repeat i from 0 to 59
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> <br>"))
+
+        socket.str(string("Off alarm time: <br> <select name='aH' size='1'>"))
+        j :=  settings.getByte(xmas_ctrl#OFF_ALARM_HOUR)
+        repeat i from 0 to 23
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> : <select name='aM' size='1'>"))
+        j :=  settings.getByte(xmas_ctrl#OFF_ALARM_MIN)  
+        repeat i from 0 to 59
+          socket.str(string("<option value="))
+          socket.dec(i)
+          if (j == i)
+            socket.str(string(" SELECTED "))
+          socket.str(string(">"))
+          socket.dec(i)
+          socket.str(string("</option>"))
+        socket.str(string("</select> <br>"))
+
+  socket.str(string("<input name='submit' type='submit' />"))
+  socket.str(string("</form>"))
+
   socket.str(string("<h3>System</h3>"))
   socket.str(string("</p><p>"))
   httpOutputLink(string("/reboot"),string("black button"),string("Reboot"))
@@ -448,3 +417,5 @@ pri indexPage | i
   httpOutputLink(@productURL,0,@productURL)
    
   socket.str(string("</body></html>",13,10))
+
+

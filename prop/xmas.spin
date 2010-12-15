@@ -72,9 +72,12 @@ PUB start(pin)
     
     ' Set up pin
     output_pin_mask := |< pin
+
+    ' ***FOR YBOX2 ONLY***
+    ' output_pin_mask := (|< 12)|(|< 13)|(|< 14)
     
     ' Set the timing information
-    period_10_us := (clkfreq/1_000_000) * 10
+    period_10_us := (clkfreq/1_000_000) * 4
     
     ' Start the cog
     cog := cognew(@cog_init, @command) + 1
