@@ -22,7 +22,7 @@
 #define XMAS_PROGRAM_OFF			255
 #define XMAS_PROGRAM_RAINBOW		1
 #define XMAS_PROGRAM_DOUBLE_RAINBOW	2
-//#define XMAS_PROGRAM_NOW_PLAYING	3
+#define XMAS_PROGRAM_NOW_PLAYING	3
 #define XMAS_PROGRAM_SIMPLE_COLOR_CYCLE	4
 
 #define sbi(x,y)	x|=(1<<y)
@@ -62,6 +62,9 @@ update_rainbow()
 #endif // #if defined(XMAS_PROGRAM_RAINBOW)
 
 #if defined(XMAS_PROGRAM_DOUBLE_RAINBOW)
+/*	Bulbs must be enumerated for individual addressing
+**	for this program to work properly.
+*/
 static void
 update_double_rainbow()
 {
@@ -82,55 +85,50 @@ update_double_rainbow()
 }
 #endif // #if defined(XMAS_PROGRAM_DOUBLE_RAINBOW)
 
-
 #if defined(XMAS_PROGRAM_NOW_PLAYING)
 /*	This program is supposed to look like the
 **	old chaser lights that were around the borders
-**	of signs. Due to a bug in the bulbs this
-**	program doesn't work so well, but I figured
-**	I would leave it in anyway.
+**	of signs. It requires that the bulbs not
+**	already be enumerated to work properly.
 */
 void
 update_now_playing()
 {
-	static const xmas_color_t color = XMAS_COLOR(15,8,2);
-	static const uint8_t increment = 16;
+	static const xmas_color_t color = XMAS_COLOR(15,7,2);
+	static const uint8_t increment = 2;
 	static const uint8_t upper_limit = XMAS_DEFAULT_INTENSITY/2/increment*increment;
-
+	
 	for(c=0;c<upper_limit;c+=increment) {
-		for(i=0;i<XMAS_LIGHT_COUNT;i++) {
-			xmas_set_color(i,XMAS_DEFAULT_INTENSITY/2+((i&1)?c:-c),color);
-		}
+		xmas_set_color(0,XMAS_DEFAULT_INTENSITY/2+c,color);
+		xmas_set_color(1,XMAS_DEFAULT_INTENSITY/2-c,color);
 	}
 	for(c=upper_limit;c!=0;c-=increment) {
-		for(i=0;i<XMAS_LIGHT_COUNT;i++) {
-			xmas_set_color(i,XMAS_DEFAULT_INTENSITY/2+((i&1)?c:-c),color);
-		}
+		xmas_set_color(0,XMAS_DEFAULT_INTENSITY/2+c,color);
+		xmas_set_color(1,XMAS_DEFAULT_INTENSITY/2-c,color);
 	}
 	for(c=0;c<upper_limit;c+=increment) {
-		for(i=0;i<XMAS_LIGHT_COUNT;i++) {
-			xmas_set_color(i,XMAS_DEFAULT_INTENSITY/2+((i&1)?-c:c),color);
-		}
+		xmas_set_color(1,XMAS_DEFAULT_INTENSITY/2+c,color);
+		xmas_set_color(0,XMAS_DEFAULT_INTENSITY/2-c,color);
 	}
 	for(c=upper_limit;c!=0;c-=increment) {
-		for(i=0;i<XMAS_LIGHT_COUNT;i++) {
-			xmas_set_color(i,XMAS_DEFAULT_INTENSITY/2+((i&1)?-c:c),color);
-		}
+		xmas_set_color(1,XMAS_DEFAULT_INTENSITY/2+c,color);
+		xmas_set_color(0,XMAS_DEFAULT_INTENSITY/2-c,color);
 	}
 }
-#endif // #if defined(XMAS_PROGRAM_DOUBLE_RAINBOW)
+#endif // #if defined(XMAS_PROGRAM_NOW_PLAYING)
 
 int
 main(void)
 {
-	// Clear the LED string to black.
+	// Enumerate the bulbs in the string
+	// for individual addressing.
 	xmas_fill_color(
 		0,
 		XMAS_LIGHT_COUNT,
-		XMAS_DEFAULT_INTENSITY,
+		0,
 		XMAS_COLOR_BLACK
 	);
-	
+//	xmas_program = XMAS_PROGRAM_NOW_PLAYING;
 	while(1) {
 		switch(xmas_program) {
 			default:
