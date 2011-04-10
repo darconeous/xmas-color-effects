@@ -10,6 +10,7 @@ CON
   ON_ALARM_MIN          = "A"+("M"<<8)
   OFF_ALARM_HOUR         = "a"+("H"<<8)
   OFF_ALARM_MIN          = "a"+("M"<<8)
+  SOLID_COLOR_KEY           = "S"+("C"<<8)
 OBJ
   settings      : "settings"
   xmas          : "xmas"
@@ -28,6 +29,10 @@ PUB start
     active := 1
     current_program := 1
 
+    if not settings.findKey(SOLID_COLOR_KEY)
+        settings.setLong(SOLID_COLOR_KEY,xmas.make_color_rgb(14,7,1))
+
+    solid_color := settings.getLong(SOLID_COLOR_KEY)
     cog := cognew(program_loop, @stack) + 1
 
 
@@ -55,6 +60,7 @@ PRI program_loop : next_event_time
                     4: program_4_step
                     5: program_5_step
                     6: program_6_step
+                    7: program_7_step
                 'delay_ms(1)
                 if subsys.RTC>next_event_time
                     active~
@@ -94,8 +100,7 @@ PRI program_3_step | i2,j,j2,count,intensity,next_off_time
             i2 //= 64
             if i2 <> xmas#BROADCAST_BULB
                 intensity := j+(xmas#MAX_INTENSITY/count)*j2
-                'xmas.set_bulb(i2,intensity*intensity/255,$7BF)
-                xmas.set_bulb(i2,intensity*intensity/255,$FFF)
+                xmas.set_bulb(i2,intensity*intensity/255,solid_color)
      
 
 PRI program_4_step | j
@@ -132,7 +137,7 @@ PRI program_5_step | i2,j,j2,count,intensity
             i2 //= 50
             if i2 <> xmas#BROADCAST_BULB
                 intensity := j+(xmas#MAX_INTENSITY/count)*j2
-                xmas.set_bulb(i2,intensity*intensity/255,xmas#COLOR_WHITE)
+                xmas.set_bulb(i2,intensity*intensity/255,solid_color)
      
 
 
@@ -145,14 +150,14 @@ PRI program_6_step | j,fading_intensity
             fading_intensity /= xmas#DEFAULT_INTENSITY
             repeat j from 0 to 49
                 if j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,$27F)
+                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
                 else
-                    xmas.set_bulb(j,fading_intensity,$27F)
+                    xmas.set_bulb(j,fading_intensity,solid_color)
         repeat j from 0 to 49
             if j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,$27F)
+                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
             else
-                xmas.set_bulb(j,0,$27F)
+                xmas.set_bulb(j,0,solid_color)
         delay_ms(250)
         repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
             fading_intensity := xmas#DEFAULT_INTENSITY-i
@@ -160,16 +165,22 @@ PRI program_6_step | j,fading_intensity
             fading_intensity /= xmas#DEFAULT_INTENSITY
             repeat j from 0 to 49
                 ifnot j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,$27F)
+                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
                 else
-                    xmas.set_bulb(j,fading_intensity,$27F)
+                    xmas.set_bulb(j,fading_intensity,solid_color)
         repeat j from 0 to 49
             ifnot j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,$27F)
+                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
             else
-                xmas.set_bulb(j,0,$27F)
+                xmas.set_bulb(j,0,solid_color)
         delay_ms(250)
 }}
+
+PRI program_7_step | i2,j,j2,count,intensity
+    ' solid
+    repeat j from 0 to xmas#MAX_BULB
+        xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
+    prog_step++
 
 PUB set_program(prog)
     current_program := prog
@@ -178,7 +189,12 @@ PUB set_program(prog)
 PUB set_active(x)
 
     active := x        
-
+PUB set_solid_color(x)
+    solid_color := x
+    settings.setLong(SOLID_COLOR_KEY,x)
+    
+VAR
+  long solid_color
 
 VAR
   long on_alarm_time 

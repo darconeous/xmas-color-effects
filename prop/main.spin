@@ -257,12 +257,18 @@ pub httpServer | char, i, contentLength,authorized,queryPtr, tmp1, tmp2, tmp3
         socket.str(string("Location: /",13,10))
         socket.str(@HTTP_CONNECTION_CLOSE)
         socket.str(@CR_LF)
-        i:=numbers.FromStr(queryPtr,numbers#HEX)
-        if i==0
-            xmas_ctrl.set_active(FALSE)
-        else
-            xmas_ctrl.set_program(i)
-            xmas_ctrl.set_active(TRUE)
+        
+        if http.getFieldFromQuery(queryPtr,string("prg"),@buffer,127)
+          i:=atoi(@buffer)
+            if i==0
+                xmas_ctrl.set_active(FALSE)
+            else
+                xmas_ctrl.set_program(i)
+                xmas_ctrl.set_active(TRUE)
+        if http.getFieldFromQuery(queryPtr,string("color"),@buffer,127)
+            i:=numbers.FromStr(@buffer,numbers#HEX)
+            xmas_ctrl.set_solid_color(i)
+            
         socket.str(string(" OK",13,10))
       else           
         socket.str(@HTTP_404)
@@ -320,17 +326,19 @@ pri indexPage | i,j
   socket.str(string("<h3>Christmas Lights</h3>"))
 
   socket.str(string("<p>"))
-  httpOutputLink(string("/xmas?1"),string("green button"),string("Rainbow"))
+  httpOutputLink(string("/xmas?prg=1"),string("green button"),string("Rainbow"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?2"),string("green button"),string("Color Cycle"))
+  httpOutputLink(string("/xmas?prg=2"),string("green button"),string("Color Cycle"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?3"),string("green button"),string("Twinkle"))
+  httpOutputLink(string("/xmas?prg=3"),string("green button"),string("Twinkle"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?4"),string("green button"),string("red/green stripes"))
+  httpOutputLink(string("/xmas?prg=4"),string("green button"),string("red/green stripes"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?5"),string("green button"),string("Trail"))
+  httpOutputLink(string("/xmas?prg=5"),string("green button"),string("Trail"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?6"),string("green button"),string("Simple Chaiser"))
+  httpOutputLink(string("/xmas?prg=6"),string("green button"),string("Simple Chaiser"))
+  socket.str(string("</p><p>"))
+  httpOutputLink(string("/xmas?prg=7"),string("green button"),string("Solid Color"))
   socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?0"),string("red button"),string("Turn Off"))
     
