@@ -84,7 +84,7 @@ PUB init | i
     subsys.click
     subsys.FadeToColorBlocking($0,0,0,0)
     delay_ms(300)
-    repeat -i <# 20
+    repeat (-i) <# 20
         subsys.FadeToColorBlocking($3F,0,0,0)
         delay_ms(300)
         subsys.FadeToColorBlocking($0,0,0,0)
