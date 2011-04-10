@@ -56,7 +56,6 @@ xmas_end() {
 	_delay_us(30);
 }
 
-
 void
 xmas_set_color(uint8_t led,uint8_t intensity,xmas_color_t color) {
 	uint8_t i;
