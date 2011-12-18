@@ -340,6 +340,8 @@ pri indexPage | i,j
   socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?prg=7"),string("green button"),string("Solid Color"))
   socket.str(string("</p><p>"))
+  httpOutputLink(string("/xmas?prg=8"),string("green button"),string("Plasma"))
+  socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?0"),string("red button"),string("Turn Off"))
     
   socket.str(string("</p>"))
