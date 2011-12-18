@@ -55,9 +55,9 @@ PRI delay_ms(Duration)
 
 PRI program_loop : next_event_time
     repeat
-        if active        
+        if active == TRUE
             next_event_time := get_next_off_alarm_time
-            repeat while active
+            repeat while active == TRUE
                 case current_program
                     1: program_1_step                
                     2: program_2_step
@@ -204,9 +204,16 @@ PUB set_program(prog)
     prog_step := 0
 	settings.setByte(CURRENT_PROGRAM_KEY,prog)
 
-PUB set_active(x)
+PUB toggle_active
+	if active
+		active~
+	else
+		active~~
+    'active := ~active
 
+PUB set_active(x)
     active := x        
+
 PUB set_solid_color(x)
     solid_color := x
     settings.setLong(SOLID_COLOR_KEY,x)

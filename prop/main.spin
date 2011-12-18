@@ -71,9 +71,7 @@ PUB init | i
 
   if NOT settings.getData(settings#NET_IPv4_ADDR,@i,4)
     repeat while NOT settings.getData(settings#NET_IPv4_ADDR,@i,4)
-      if ina[subsys#BTTNPin]
-        reboot
-      delay_ms(500)
+      buttonCheck
 
   subsys.StatusIdle
   subsys.chirpHappy
@@ -137,19 +135,22 @@ pri httpUnauthorized(authorized)
   socket.str(@CR_LF)
   socket.str(@HTTP_401)
 
+pri buttonCheck
+  if ina[subsys#BTTNPin]
+    repeat while ina[subsys#BTTNPin]
+    xmas_ctrl.toggle_active
+
 pub httpServer | char, i, contentLength,authorized,queryPtr, tmp1, tmp2, tmp3
 
   repeat
     subsys.StatusIdle
-    if ina[subsys#BTTNPin]
-      reboot
+    buttonCheck
 
     socket.listen(80)
 
     repeat while NOT socket.isConnected
       socket.waitConnectTimeout(100)
-      if ina[subsys#BTTNPin]
-        reboot
+      buttonCheck
 
     subsys.StatusActivity
 
@@ -353,7 +354,7 @@ pri indexPage | i,j
   socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?prg=8"),string("green button"),string("Plasma"))
   socket.str(string("</p><p>"))
-  httpOutputLink(string("/xmas?0"),string("red button"),string("Turn Off"))
+  httpOutputLink(string("/xmas?prg=0"),string("red button"),string("Turn Off"))
   socket.str(string("</p><p>"))
   httpOutputLink(string("/commit"),string("yellow button"),string("Save Settings"))
     
