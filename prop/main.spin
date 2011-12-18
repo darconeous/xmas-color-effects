@@ -248,6 +248,17 @@ pub httpServer | char, i, contentLength,authorized,queryPtr, tmp1, tmp2, tmp3
         socket.str(@CR_LF)
         socket.str(string("OK",13,10))
 
+      elseif strcomp(@httpPath,string("/commit"))
+        if authorized<>auth#STAT_AUTH
+          httpUnauthorized(authorized)
+          socket.close
+          next
+        socket.str(@HTTP_303)
+        socket.str(string("Location: /",13,10))
+        socket.str(@HTTP_CONNECTION_CLOSE)
+        socket.str(@CR_LF)
+        settings.commit
+        socket.str(string(" OK",13,10))
       elseif strcomp(@httpPath,string("/xmas"))
         if authorized<>auth#STAT_AUTH
           httpUnauthorized(authorized)
@@ -343,6 +354,8 @@ pri indexPage | i,j
   httpOutputLink(string("/xmas?prg=8"),string("green button"),string("Plasma"))
   socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?0"),string("red button"),string("Turn Off"))
+  socket.str(string("</p><p>"))
+  httpOutputLink(string("/commit"),string("yellow button"),string("Save Settings"))
     
   socket.str(string("</p>"))
 

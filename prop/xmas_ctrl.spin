@@ -11,6 +11,7 @@ CON
   OFF_ALARM_HOUR         = "a"+("H"<<8)
   OFF_ALARM_MIN          = "a"+("M"<<8)
   SOLID_COLOR_KEY           = "S"+("C"<<8)
+  CURRENT_PROGRAM_KEY           = "C"+("P"<<8)
 OBJ
   settings      : "settings"
   xmas          : "xmas"
@@ -32,7 +33,11 @@ PUB start
     if not settings.findKey(SOLID_COLOR_KEY)
         settings.setLong(SOLID_COLOR_KEY,xmas.make_color_rgb(14,7,1))
 
+    if not settings.findKey(CURRENT_PROGRAM_KEY)
+        settings.setByte(CURRENT_PROGRAM_KEY,1)
+
     solid_color := settings.getLong(SOLID_COLOR_KEY)
+    current_program := settings.getByte(CURRENT_PROGRAM_KEY)
     cog := cognew(program_loop, @stack) + 1
 
 
@@ -197,6 +202,7 @@ PRI sinTable(angle) ' input is $0000-$1FFF, output is 17-bit signed
 PUB set_program(prog)
     current_program := prog
     prog_step := 0
+	settings.setByte(CURRENT_PROGRAM_KEY,prog)
 
 PUB set_active(x)
 
