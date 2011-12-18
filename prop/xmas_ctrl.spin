@@ -141,9 +141,9 @@ PRI program_5_step | i2,j,j2,count,intensity
      
 
 
-PRI program_6_step | j,fading_intensity
+PRI program_6_step | i,j,fading_intensity
     ' simple chaser
-{{    repeat
+    repeat
         repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
             fading_intensity := xmas#DEFAULT_INTENSITY-i
             fading_intensity *= fading_intensity
@@ -174,7 +174,7 @@ PRI program_6_step | j,fading_intensity
             else
                 xmas.set_bulb(j,0,solid_color)
         delay_ms(250)
-}}
+
 
 PRI program_7_step | i2,j,j2,count,intensity
     ' solid
