@@ -67,6 +67,9 @@ PRI program_loop : next_event_time
                     6: program_6_step
                     7: program_7_step
                     8: program_8_step
+                    9: program_9_step
+                    10: program_10_step
+                    11: program_11_step
                 'delay_ms(1)
                 if subsys.RTC>next_event_time
                     active~
@@ -194,6 +197,50 @@ PRI program_8_step | j,r,g,b
 		g := sinTable(j*$FF + prog_step*$40)+$FFFF
 		b := sinTable(j*$8B + prog_step*$22)+$FFFF
 		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_rgb(r>>13,g>>13,b>>13))
+    prog_step++
+
+PRI make_fire_gradient(x)
+    case (x>>4)
+        0:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(x,0,0)
+        1:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(xmas#MAX_COLOR_VALUE,x,0)
+        2:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(xmas#MAX_COLOR_VALUE,xmas#MAX_COLOR_VALUE,x)
+    return 0
+
+PRI program_9_step | j,r
+    repeat j from 0 to xmas#MAX_BULB
+		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,make_fire_gradient(r>>13))
+    prog_step++
+
+PRI make_ice_gradient(x)
+    case (x>>4)
+        0:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(0,0,x)
+        1:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(0,x,xmas#MAX_COLOR_VALUE)
+        2:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(x,xmas#MAX_COLOR_VALUE,xmas#MAX_COLOR_VALUE)
+    return 0
+
+PRI program_10_step | j,r
+    repeat j from 0 to xmas#MAX_BULB
+		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,make_ice_gradient(r>>13))
+    prog_step++
+
+PRI program_11_step | j,r
+    repeat j from 0 to xmas#MAX_BULB
+		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_hue(r>>12))
     prog_step++
 
 PRI sinTable(angle) ' input is $0000-$1FFF, output is 17-bit signed
