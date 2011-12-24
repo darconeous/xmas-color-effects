@@ -360,6 +360,8 @@ pri indexPage | i,j
   socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?prg=11"),string("green button"),string("Hue Plasma"))
   socket.str(string("</p><p>"))
+  httpOutputLink(string("/xmas?prg=12"),string("green button"),string("RWG Plasma"))
+  socket.str(string("</p><p>"))
   httpOutputLink(string("/xmas?prg=0"),string("red button"),string("Turn Off"))
   socket.str(string("</p><p>"))
   httpOutputLink(string("/commit"),string("yellow button"),string("Save Settings"))

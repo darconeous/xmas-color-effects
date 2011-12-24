@@ -27,7 +27,7 @@ PUB start
     stop
     xmas.start(12)
     xmas.set_standard_enum
-    active := 1
+    active := TRUE
     current_program := 1
 
     if not settings.findKey(SOLID_COLOR_KEY)
@@ -70,6 +70,7 @@ PRI program_loop : next_event_time
                     9: program_9_step
                     10: program_10_step
                     11: program_11_step
+                    12: program_12_step
                 'delay_ms(1)
                 if subsys.RTC>next_event_time
                     active~
@@ -152,37 +153,36 @@ PRI program_5_step | i2,j,j2,count,intensity
 
 PRI program_6_step | i,j,fading_intensity
     ' simple chaser
-    repeat
-        repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
-            fading_intensity := xmas#DEFAULT_INTENSITY-i
-            fading_intensity *= fading_intensity
-            fading_intensity /= xmas#DEFAULT_INTENSITY
-            repeat j from 0 to 49
-                if j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
-                else
-                    xmas.set_bulb(j,fading_intensity,solid_color)
-        repeat j from 0 to 49
-            if j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
-            else
-                xmas.set_bulb(j,0,solid_color)
-        delay_ms(250)
-        repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
-            fading_intensity := xmas#DEFAULT_INTENSITY-i
-            fading_intensity *= fading_intensity
-            fading_intensity /= xmas#DEFAULT_INTENSITY
-            repeat j from 0 to 49
-                ifnot j&1
-                    xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
-                else
-                    xmas.set_bulb(j,fading_intensity,solid_color)
-        repeat j from 0 to 49
-            ifnot j&1
-                xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
-            else
-                xmas.set_bulb(j,0,solid_color)
-        delay_ms(250)
+	repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
+		fading_intensity := xmas#DEFAULT_INTENSITY-i
+		fading_intensity *= fading_intensity
+		fading_intensity /= xmas#DEFAULT_INTENSITY
+		repeat j from 0 to 49
+			if j&1
+				xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
+			else
+				xmas.set_bulb(j,fading_intensity,solid_color)
+	repeat j from 0 to 49
+		if j&1
+			xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
+		else
+			xmas.set_bulb(j,0,solid_color)
+	delay_ms(250)
+	repeat i from 0 to xmas#DEFAULT_INTENSITY step 16
+		fading_intensity := xmas#DEFAULT_INTENSITY-i
+		fading_intensity *= fading_intensity
+		fading_intensity /= xmas#DEFAULT_INTENSITY
+		repeat j from 0 to 49
+			ifnot j&1
+				xmas.set_bulb(j,(i*3)<#xmas#DEFAULT_INTENSITY,solid_color)
+			else
+				xmas.set_bulb(j,fading_intensity,solid_color)
+	repeat j from 0 to 49
+		ifnot j&1
+			xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,solid_color)
+		else
+			xmas.set_bulb(j,0,solid_color)
+	delay_ms(250)
 
 
 PRI program_7_step | i2,j,j2,count,intensity
@@ -193,9 +193,9 @@ PRI program_7_step | i2,j,j2,count,intensity
 
 PRI program_8_step | j,r,g,b
     repeat j from 0 to xmas#MAX_BULB
-		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
-		g := sinTable(j*$FF + prog_step*$40)+$FFFF
-		b := sinTable(j*$8B + prog_step*$22)+$FFFF
+		r := sinTable(j*$A0 - prog_step*$59*3)+$FFFF
+		g := sinTable(j*$FF + prog_step*$40*3)+$FFFF
+		b := sinTable(j*$8B + prog_step*$22*3)+$FFFF
 		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_rgb(r>>13,g>>13,b>>13))
     prog_step++
 
@@ -211,9 +211,9 @@ PRI make_fire_gradient(x)
 
 PRI program_9_step | j,r
     repeat j from 0 to xmas#MAX_BULB
-		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
-		r += sinTable(j*$FF + prog_step*$40)+$FFFF
-		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		r := sinTable(j*$A0 - prog_step*$59*3)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40*3)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22*3)+$FFFF
 		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,make_fire_gradient(r>>13))
     prog_step++
 
@@ -229,18 +229,39 @@ PRI make_ice_gradient(x)
 
 PRI program_10_step | j,r
     repeat j from 0 to xmas#MAX_BULB
-		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
-		r += sinTable(j*$FF + prog_step*$40)+$FFFF
-		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		r := sinTable(j*$A0 - prog_step*$59*3)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40*3)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22*3)+$FFFF
 		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,make_ice_gradient(r>>13))
     prog_step++
 
 PRI program_11_step | j,r
     repeat j from 0 to xmas#MAX_BULB
-		r := sinTable(j*$A0 - prog_step*$59)+$FFFF
-		r += sinTable(j*$FF + prog_step*$40)+$FFFF
-		r += sinTable(j*$8B + prog_step*$22)+$FFFF
+		r := sinTable(j*$A0 - prog_step*$59*3)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40*3)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22*3)+$FFFF
 		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,xmas.make_color_hue(r>>12))
+    prog_step++
+
+PRI make_xmas_gradient(x)
+    case (x>>3)
+        0:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(xmas#MAX_COLOR_VALUE-x,0,0)
+        1:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(xmas#MAX_COLOR_VALUE,x*2,x*2)
+        2:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(xmas#MAX_COLOR_VALUE-x*2,xmas#MAX_COLOR_VALUE,xmas#MAX_COLOR_VALUE-x*2)
+        3:  x &= xmas#MAX_COLOR_VALUE
+            return xmas.make_color_rgb(0,xmas#MAX_COLOR_VALUE-x,0)
+    return 0
+
+PRI program_12_step | j,r
+    repeat j from 0 to xmas#MAX_BULB
+		r := sinTable(j*$A0 - prog_step*$59*3)+$FFFF
+		r += sinTable(j*$FF + prog_step*$40*3)+$FFFF
+		r += sinTable(j*$8B + prog_step*$22*3)+$FFFF
+		r += sinTable(j*$56 - prog_step*$30*3)+$FFFF
+		xmas.set_bulb(j,xmas#DEFAULT_INTENSITY,make_xmas_gradient(r>>14))
     prog_step++
 
 PRI sinTable(angle) ' input is $0000-$1FFF, output is 17-bit signed
@@ -305,4 +326,4 @@ pub get_next_off_alarm_time : retval
         retval += constant(60*60*24)
 
 pub get_on_off_status
-    return get_next_on_alarm_time > get_next_off_alarm_time 
+    return get_next_on_alarm_time > get_next_off_alarm_time
