@@ -245,12 +245,10 @@ run
               or dira,LEDBMask
               'or dira,SPKRMask
 
-{
               ' Set up CTRA for the button watchdog.
               mov phsa,#0
               mov ctra,RSTCTR
               mov frqa,RSTFRQ
-}
 
               ' Set up RTCLAST for RTC
               rdlong RTCLAST,#0
@@ -258,7 +256,6 @@ run
               
 loop
 
-{
               ' If the button was released,
               ' reset the phase register.
               mov  T1,#1
@@ -271,7 +268,6 @@ loop
               ' than 5 seconds, then reset the board.
               cmp  RSTTIME,phsa wc
         if_c  clkset RSTCLK
-}
 
 LEDDutyLoop
 
@@ -279,7 +275,6 @@ LEDDutyLoop
               shl T1,LEDRBright
               add LEDRP,T1 wc
 LEDRJmp       long %010111_0001_0011_000000000_000000000 + :LEDROff
-'        if_nc jmp #:LEDROff
               or outa,LEDRMask
               jmp #:LEDRDone
 :LEDROff
@@ -290,7 +285,6 @@ LEDRJmp       long %010111_0001_0011_000000000_000000000 + :LEDROff
               shl T1,LEDGBright
               add LEDGP,T1 wc
 LEDGJmp       long %010111_0001_0011_000000000_000000000 + :LEDGOff
-'        if_nc jmp #:LEDGOff
               or outa,LEDGMask
               jmp #:LEDGDone
 :LEDGOff
@@ -301,7 +295,6 @@ LEDGJmp       long %010111_0001_0011_000000000_000000000 + :LEDGOff
               shl T1,LEDBBright
               add LEDBP,T1 wc
 LEDBJmp       long %010111_0001_0011_000000000_000000000 + :LEDBOff
-'        if_nc jmp #:LEDBOff
               or outa,LEDBMask
               jmp #:LEDBDone
 :LEDBOff
@@ -335,7 +328,7 @@ SPKRMask      long (1 << SPKRPin)
 
 RSTCTR        long  %01000_111 << 23 + BTTNPin << 9 + 0
 RSTFRQ        long  1
-RSTTIME       long  5*80_000_0000
+RSTTIME       long  5*80_000_000
 RSTCLK        long  -1
 RTCPTR        long RTCADDR
 RTCLAST       res  1
