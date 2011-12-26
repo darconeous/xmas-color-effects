@@ -12,6 +12,9 @@ CON
   OFF_ALARM_MIN          = "a"+("M"<<8)
   SOLID_COLOR_KEY           = "S"+("C"<<8)
   CURRENT_PROGRAM_KEY           = "C"+("P"<<8)
+
+  ON_PIN		= 24
+
 OBJ
   settings      : "settings"
   xmas          : "xmas"
@@ -40,7 +43,6 @@ PUB start
     current_program := settings.getByte(CURRENT_PROGRAM_KEY)
     cog := cognew(program_loop, @stack) + 1
 
-
 PUB stop
     if cog
         cogstop(cog~ - 1)
@@ -53,10 +55,18 @@ PUB refresh_alarm_settings
 PRI delay_ms(Duration)
     waitcnt(((clkfreq / 1_000 * Duration - 3932)) + cnt)
 
+PRI delay_s(Duration)
+	repeat Duration
+		waitcnt(1000)
+
 PRI program_loop : next_event_time
     repeat
+		dira[ON_PIN] := 1
         if active == TRUE
             next_event_time := get_next_off_alarm_time
+			outa[ON_PIN] := 1
+			delay_ms(250)
+            xmas.set_standard_enum
             repeat while active == TRUE
                 case current_program
                     1: program_1_step                
@@ -76,6 +86,7 @@ PRI program_loop : next_event_time
                     active~
             xmas.set_standard_enum
         else
+			outa[ON_PIN] := 0
             next_event_time := get_next_on_alarm_time
             xmas.set_standard_enum
             repeat until active
@@ -148,7 +159,6 @@ PRI program_5_step | i2,j,j2,count,intensity
             if i2 <> xmas#BROADCAST_BULB
                 intensity := j+(xmas#MAX_INTENSITY/count)*j2
                 xmas.set_bulb(i2,intensity*intensity/255,solid_color)
-     
 
 
 PRI program_6_step | i,j,fading_intensity
