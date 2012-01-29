@@ -1,8 +1,3 @@
-# GE Color Effects G-35 Driver #
-
-More information can be found on the original blog post on deep darc:
-<http://www.deepdarc.com/2010/11/27/hacking-christmas-lights/>
-
 This code was written by Robert Quattlebaum <darco@deepdarc.com>.
 
 This work is provided as-is. Unless otherwise provided in writing,
@@ -28,4 +23,3 @@ possible, I hereby release this code under the Creative Commons
 Zero (CC0) license.
 
  * <http://creativecommons.org/publicdomain/zero/1.0/>
-
